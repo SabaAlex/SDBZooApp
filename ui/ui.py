@@ -1,12 +1,12 @@
-from entities import Animal
-from service import AnimalServices
-from exceptions import EmptyExceptions
+from domain.animal import Animal
+from service.animal_service import AnimalService
+from domain.exceptions import EmptyExceptions
 
 class UI:
     DEFAULT_AGE = 0
 
-    def __init__(self, service: AnimalServices):
-        self.__service = service
+    def __init__(self, animal_service: AnimalService):
+        self.__animal_service = animal_service
 
     def __print_menu(self):
         print("1. Add animal")
@@ -35,7 +35,7 @@ class UI:
             return
 
         age = int(age_str)
-        result = self.__service.add_animal(Animal(name, age))
+        result = self.__animal_service.add_animal(Animal(name, age))
         if result:
             print("Successfully added animal")
         else:
@@ -45,20 +45,20 @@ class UI:
         name = input("Enter animal name: ")
 
         animal = Animal(name, UI.DEFAULT_AGE)
-        if self.__service.delete_animal(animal):
+        if self.__animal_service.delete_animal(animal):
             print("Animal successfully removed")
         else:
             print("Animal does not exist")
 
     def __median_age(self):
         try:
-            result = self.__service.average_age()
+            result = self.__animal_service.average_age()
             print(f"Median age is {result}")
         except EmptyExceptions:
             print("No animals")
 
     def __print_animals(self):
-        animals = self.__service.get_all_animals()
+        animals = self.__animal_service.get_all_animals()
 
         if len(animals) == 0:
             print("No animals")
