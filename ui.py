@@ -14,11 +14,11 @@ class UI:
         }
 
     def __print_menu(self):
-        print("1.Add animal")
-        print("2.Delete animal")
-        print("3.Average zoo age")
-        print("4.Show all animals")
-        print("0.Exit")
+        print("1. Add animal")
+        print("2. Delete animal")
+        print("3. Average zoo age")
+        print("4. Show all animals")
+        print("0. Exit")
 
     def __validate_age(self, age):
         try:
