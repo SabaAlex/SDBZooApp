@@ -1,10 +1,11 @@
-from service import AnimalServices
-from ui import UI
-from entities import Animal
+from service.animal_service import AnimalService
+from ui.ui import UI
+from domain.animal import Animal
+from repository.in_memory_repository import Repository
 
-service = AnimalServices()
-service.add_animal(Animal("Rex", 12))
-service.add_animal(Animal("Banana", 2))
+
+animal_repository = Repository([Animal("Rex", 12), Animal("Banana", 2)])
+service = AnimalService(animal_repository)
 
 ui = UI(service)
 
