@@ -9,6 +9,13 @@ class AnimalService:
     def __init__(self, repository: Repository):
         self.__repository = repository
 
+    def get_animal(self, animal_name):
+        animals = self.__repository.read()
+        for animal in animals:
+            if animal.get_name() == animal_name:
+                return animal
+        return None
+
     def add_animal(self, animal: Animal) -> bool:
         return self.__repository.create(animal)
 
@@ -18,15 +25,4 @@ class AnimalService:
     def get_all_animals(self) -> List[Animal]:
         return self.__repository.read()
 
-    def average_age(self) -> float:
-        animals = self.__repository.read()
-        if len(animals) == 0:
-            raise EmptyExceptions("Collection is empty")
 
-        age_sum = 0
-        for animal in animals:
-            age_sum += animal.get_age()
-
-        median = age_sum / len(animals)
-
-        return median
