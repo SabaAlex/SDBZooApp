@@ -1,2 +1,2 @@
-class CustomException(Exception):
+class EmptyExceptions(Exception):
     pass
