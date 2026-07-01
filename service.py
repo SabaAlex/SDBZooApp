@@ -1,56 +1,60 @@
-from ZooApp.entities import Animal
-from ZooApp.exceptions import CustomException
+from typing import List
+from entities import Animal
+from exceptions import EmptyExceptions
 
-
-class Service:
+class AnimalServices:
     def __init__(self):
-        self.__animal_list = [Animal('Rex', 2), Animal('Luna', 5)]
+        self.__animals = []
 
-    def add_animal(self, new_animal: Animal):
-        """
-        This adds an animal to the animal list
-        :param new_animal: the animal to be added (Animal)
-        """
-        for animal in self.__animal_list:
-            if animal == new_animal:
-                raise CustomException(f'The animal {new_animal} already exists!')
-        self.__animal_list.append(new_animal)
+    def __animal_exists(self, animal_to_find: Animal) -> bool:
+        for animal in self.__animals:
+            if animal == animal_to_find:
+                return True
 
-    def delete_animal(self, animal_to_delete):
-        """
-        Deletes an animal from the animal list
-        :param animal_to_delete: Animal to delete from in the list (Animal)
-        """
-        animal_position = self.__get_animal_position(animal_to_delete)
-        if animal_position is None:
-            raise CustomException(f'The animal {animal_to_delete} does not exist!')
-        del self.__animal_list[animal_position]
+        return False
 
-    def get_all_animals(self):
+    def add_animal(self, new_animal: Animal) -> bool:
         """
-        Returns the list containing all the animals
-        :return: The list of all the animals (list)
+        This adds a new animal
+        :param new_animal: the animal to be added
+        :return: True if the animal was added false otherwise
         """
-        return self.__animal_list
+        if self.__animal_exists(new_animal):
+            return False
 
-    def average_age(self):
-        """
-        Returns the average of all the animals in the list
-        :return: The average age of all the animals (float)
-        """
-        sum = 0
-        for animal in self.__animal_list:
-            sum += animal.get_age()
-        average_age = sum / len(self.__animal_list)
-        return average_age
+        self.__animals.append(new_animal)
+        return True
 
-    def __get_animal_position(self, animal_to_find):
-        """
-        Returns the position of a animal in the animal list, None if it doesn't exist
-        :param animal_to_find: Animal to search for in the list (Animal)
-        :return: The position of the animal if it is in the list (int), otherwise None
-        """
-        for i in range(len(self.__animal_list)):
-            if self.__animal_list[i] == animal_to_find:
-                return i
+    def __find_position_of_animal(self, animal_to_find):
+        animals = self.__animals
+        for index in range(len(animals)):
+            animal = animals[index]
+            if animal == animal_to_find:
+                return index
+
         return None
+
+    def delete_animal(self, animal_to_delete: Animal) -> bool:
+        position = self.__find_position_of_animal(animal_to_delete)
+
+        if position is None:
+            return False
+
+        del self.__animals[position]
+        return True
+
+    def get_all_animals(self) -> List[Animal]:
+        return self.__animals
+
+    def average_age(self) -> float:
+        if len(self.__animals) == 0:
+            raise EmptyExceptions("Collection is empty")
+
+        animals = self.__animals
+        age_sum = 0
+        for animal in animals:
+            age_sum += animal.get_age()
+
+        median = age_sum / len(animals)
+
+        return median

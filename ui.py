@@ -1,66 +1,88 @@
-from ZooApp.entities import Animal
-from ZooApp.exceptions import CustomException
-from ZooApp.service import Service
-
+from entities import Animal
+from service import AnimalServices
+from exceptions import EmptyExceptions
 
 class UI:
-    def __init__(self, service: Service):
+    DEFAULT_AGE = 0
+
+    def __init__(self, service: AnimalServices):
         self.__service = service
-        self.__commands = {
-            "1": self.__add_animal,
-            "2": self.__delete_animal,
-            "3": self.__average_animal_age,
-            "4": self.__show_all_animals,
-        }
 
     def __print_menu(self):
-        print("1.Add animal")
-        print("2.Delete animal")
-        print("3.Average zoo age")
-        print("4.Show all animals")
-        print("0.Exit")
+        print("1. Add animal")
+        print("2. Remove animal")
+        print("3. Median age")
+        print("4. Print all animals")
+        print("0. Exit")
 
-    def __validate_age(self, age):
+    def __validate_age(self, value:str):
         try:
-            int(age)
+            value = int(value)
         except ValueError:
-            raise CustomException('Animal age is not a number!')
+            return False
 
+        if value < 0 or value > 100:
+            return False
+
+        return True
 
     def __add_animal(self):
-        name = input("Animal name: ")
-        age = input("Animal age: ")
-        self.__validate_age(age)
-        self.__service.add_animal(Animal(name, int(age)))
-        print('Animal added!')
+        name = input("Enter animal name: ")
+        age_str = input("Enter animal's age: ")
 
-    def __delete_animal(self):
-        name = input("Animal to delete name: ")
-        age = input("Animal to delete age: ")
-        self.__validate_age(age)
-        self.__service.delete_animal(Animal(name, int(age)))
-        print('Animal deleted!')
+        if not self.__validate_age(age_str):
+            print("Age must be between 0 and 100")
+            return
 
-    def __show_all_animals(self):
-        for animal in self.__service.get_all_animals():
+        age = int(age_str)
+        result = self.__service.add_animal(Animal(name, age))
+        if result:
+            print("Successfully added animal")
+        else:
+            print("Animal already exists")
+
+    def __remove_animal(self):
+        name = input("Enter animal name: ")
+
+        animal = Animal(name, UI.DEFAULT_AGE)
+        if self.__service.delete_animal(animal):
+            print("Animal successfully removed")
+        else:
+            print("Animal does not exist")
+
+    def __median_age(self):
+        try:
+            result = self.__service.average_age()
+            print(f"Median age is {result}")
+        except EmptyExceptions:
+            print("No animals")
+
+    def __print_animals(self):
+        animals = self.__service.get_all_animals()
+
+        if len(animals) == 0:
+            print("No animals")
+            return
+
+        for animal in animals:
             print(animal)
 
-
-    def __average_animal_age(self):
-        average_age = round(self.__service.average_age(), 2)
-        print(f'The average age of all the animals is {average_age}')
-
     def run(self):
-        while True:
+        running = True
+        while running:
             self.__print_menu()
-            try:
-                command = input("Choose the command:").strip()
-                # actions[command]()
-                if command == "0":
-                    return
-                if command in self.__commands:
-                    self.__commands[command]()
-                else:
-                    print('Command does not exist!')
-            except CustomException as error:
-                print(error)
+            command = input("Enter your choice: ")
+            print(f"Processing {command}")
+            if command == "0":
+                print("Exiting...")
+                running = False
+            elif command == "1":
+                self.__add_animal()
+            elif command == "2":
+                self.__remove_animal()
+            elif command == "3":
+                self.__median_age()
+            elif command == "4":
+                self.__print_animals()
+            else:
+                print("Invalid command. Please enter a valid command.")
